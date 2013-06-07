@@ -16,7 +16,7 @@
 
 @implementation AddViewController
 
-@synthesize myTableView, specialty, doctor, datePicker, toolbar, visitDate, visitTime;
+@synthesize myTableView, specialty, doctor, datePicker, toolbar, visitDate, visitTime, lastSelected;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -27,6 +27,7 @@
     return self;
 }
 
+#pragma mark - Views Management
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -44,36 +45,25 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setDoctorName:) name:@"doctorChosen" object:nil];
 }
 
+-(void)viewDidAppear:(BOOL)animated
+{
+
+}
+
 -(void)viewWillAppear:(BOOL)animated
 {
+    NSIndexPath *selected = [myTableView indexPathForSelectedRow];
+    if (selected) [myTableView deselectRowAtIndexPath:selected animated:YES];
+    
     [self.navigationController setNavigationBarHidden:NO animated:NO];
     
     UIBarButtonItem *rightButton = [[UIBarButtonItem alloc] initWithTitle:@"Confirm" style:UIBarButtonItemStyleDone target:self action:@selector(saveAndQuit)];
     [self.navigationItem setRightBarButtonItem:rightButton];
-        
-    NSIndexPath *selected = [myTableView indexPathForSelectedRow];
-    if (selected) {
-        [myTableView deselectRowAtIndexPath:selected animated:YES];}
     
     [myTableView reloadData];
 }
 
-
--(void)saveAndQuit
-{
-    NSString *date = [NSString stringWithFormat:@"%@ - %@", visitTime, visitDate];
-    
-    NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:date, @"date", specialty, @"specialty", doctor, @"name", @"75 Francis St. Boston, MA 02115", @"address" , nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"nextVisitAdded" object:nil userInfo:dict];
-    
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
--(void)cancel
-{
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
+#pragma mark - NSNotificationCenter callbacks
 -(void)setSpecialty:(NSNotification *)notification
 {
     NSDictionary *dict = [notification userInfo];
@@ -86,17 +76,10 @@
     doctor = [dict objectForKey:@"doctor"];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    // Return the number of sections.
     return 2;
 }
 
@@ -179,54 +162,11 @@
     return cell;
 }
 
--(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    AddListViewController *listVC = (AddListViewController *)segue.destinationViewController;
-    NSIndexPath *indexPath =  [myTableView indexPathForSelectedRow];
-    
-    if (indexPath.section == 0) {
-        
-        if (indexPath.row == 0) {
-            listVC.listNumber = 0;
-            
-        } else {
-            listVC.listNumber = 1;
-        }
-        
-    }
-}
-
--(BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
-{
-    NSIndexPath *indexPath =  [myTableView indexPathForSelectedRow];
-    
-    if (indexPath.section == 0) {
-        
-        if (indexPath.row == 0) {
-            return YES;
-            
-        } else {
-            return YES;
-        }
-        
-    } else {
-        
-        if (indexPath.row == 0) {
-            return NO;
-            
-        } else {
-            return NO;
-        }
-    }
-}
-
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.section == 1) {
         
         if (indexPath.row == 0) {
-            
-            [tableView deselectRowAtIndexPath:indexPath animated:YES];
             
             datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 264, 320, 400)];
             [datePicker setDatePickerMode:UIDatePickerModeDate];
@@ -234,18 +174,16 @@
             toolbar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 220, 320, 50)];
             toolbar.barStyle = UIBarStyleBlackTranslucent;
             toolbar.items = [NSArray arrayWithObjects:
-                                   [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonSystemItemCancel target:self action:@selector(dismissDate)],
-                                   [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                                   [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(saveDate)],
-                                   nil];
+                             [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonSystemItemCancel target:self action:@selector(dismissDate)],
+                             [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                             [[UIBarButtonItem alloc]initWithTitle:@"Done" style:UIBarButtonItemStyleDone target:self action:@selector(saveDate)],
+                             nil];
             [toolbar sizeToFit];
             
             [[[UIApplication sharedApplication] keyWindow] addSubview:toolbar];
             [[[UIApplication sharedApplication] keyWindow] addSubview:datePicker];
             
         } else {
-            
-            [tableView deselectRowAtIndexPath:indexPath animated:YES];
             
             datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0, 264, 320, 400)];
             [datePicker setDatePickerMode:UIDatePickerModeTime];
@@ -267,6 +205,52 @@
     }
 }
 
+
+#pragma mark - Segues
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+{
+    AddListViewController *listVC = (AddListViewController *)segue.destinationViewController;
+    NSIndexPath *indexPath =  [myTableView indexPathForSelectedRow];
+    
+    if (indexPath.section == 0) {
+        
+        if (indexPath.row == 0) {
+            listVC.listNumber = 0;
+            
+        } else {
+            listVC.listNumber = 1;
+        }
+        
+    }
+}
+
+-(BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender
+{
+    NSIndexPath *indexPath =  [myTableView indexPathForSelectedRow];
+    lastSelected = [[NSIndexPath alloc] init];
+    lastSelected = indexPath;
+    
+    if (indexPath.section == 0) {
+        
+        if (indexPath.row == 0) {
+            return YES;
+            
+        } else {
+            return YES;
+        }
+        
+    } else {
+        
+        if (indexPath.row == 0) {
+            return NO;
+            
+        } else {
+            return NO;
+        }
+    }
+}
+
+#pragma mark - Save & Quit functions
 -(void)saveTime
 {
     NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
@@ -311,5 +295,29 @@
         [toolbar removeFromSuperview];
     }];
 }
+
+
+-(void)saveAndQuit
+{
+    NSString *date = [NSString stringWithFormat:@"%@ - %@", visitTime, visitDate];
+    
+    NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:date, @"date", specialty, @"specialty", doctor, @"name", @"75 Francis St. Boston, MA 02115", @"address" , nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"nextVisitAdded" object:nil userInfo:dict];
+    
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+-(void)cancel
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - Memory
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+}
+
+
 
 @end

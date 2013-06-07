@@ -4,10 +4,10 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="2083"/>
     </dependencies>
     <scenes>
-        <!--View Controller - Home-->
+        <!--Home View Controller - Home-->
         <scene sceneID="5">
             <objects>
-                <viewController storyboardIdentifier="homeViewID" id="2" customClass="ViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="homeViewID" id="2" customClass="HomeViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="3">
                         <rect key="frame" x="0.0" y="64" width="320" height="416"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -68,8 +68,9 @@
                                     <constraint firstAttribute="height" constant="58" id="5p4-Qf-VXX"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="13" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FfH-RD-vQA">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="13" adjustsLetterSpacingToFitWidth="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FfH-RD-vQA">
                                 <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="Y9D-rq-jDs"/>
                                     <constraint firstAttribute="width" constant="307" id="sl8-RN-rfg"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="Helvetica" family="Helvetica" pointSize="17"/>
@@ -169,7 +170,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="54"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" minimumFontSize="12" adjustsLetterSpacingToFitWidth="YES" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="OEN-32-JFb">
+                                        <label opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" minimumFontSize="12" adjustsLetterSpacingToFitWidth="YES" preferredMaxLayoutWidth="27" translatesAutoresizingMaskIntoConstraints="NO" id="OEN-32-JFb">
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                             <color key="highlightedColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -309,7 +310,7 @@
                                             <constraint firstAttribute="height" constant="38" id="ndM-me-SgR"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
-                                        <state key="normal" title="Confirm" backgroundImage="confirm@2x.png">
+                                        <state key="normal" title="Sign up" backgroundImage="confirm@2x.png">
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
@@ -343,7 +344,7 @@
                                             <constraint firstAttribute="width" constant="206" id="PhZ-kO-xxx"/>
                                         </constraints>
                                     </imageView>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Username" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="tg1-dW-W2y" userLabel="UsernameTf">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Username" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="tg1-dW-W2y" userLabel="UsernameTf">
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="sIg-a8-fce"/>
                                         </constraints>
@@ -359,7 +360,7 @@
                                             <constraint firstAttribute="width" constant="206" id="z2Q-kh-ur3"/>
                                         </constraints>
                                     </imageView>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ec5-wi-jjy" userLabel="passwordTf">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="ec5-wi-jjy" userLabel="passwordTf">
                                         <constraints>
                                             <constraint firstAttribute="width" constant="192" id="fBa-ZQ-cKA"/>
                                             <constraint firstAttribute="height" constant="28" id="iYl-98-84a"/>
@@ -384,7 +385,7 @@
                                             <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
-                                            <action selector="signIn:" destination="JCC-e5-lZ3" eventType="touchUpInside" id="pCV-5w-2TT"/>
+                                            <action selector="switchLogin:" destination="JCC-e5-lZ3" eventType="touchUpInside" id="WYo-k3-ojc"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -429,6 +430,7 @@
                     <nil key="simulatedTopBarMetrics"/>
                     <connections>
                         <outlet property="bigTitle" destination="nxs-5M-2wn" id="ccE-ct-shl"/>
+                        <outlet property="confirmBtn" destination="zl5-WQ-Wmf" id="Bvj-nM-7E5"/>
                         <outlet property="myScrollView" destination="dfo-8S-qzq" id="CRs-LA-wBB"/>
                         <outlet property="nameImg" destination="opG-ot-ABm" id="xnA-S2-f16"/>
                         <outlet property="nameTf" destination="CVB-Ob-Xrb" id="eJc-xy-5Gw"/>

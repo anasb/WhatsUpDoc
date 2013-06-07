@@ -12,11 +12,12 @@
 
 @property (nonatomic, assign) IBOutlet UITableView *myTableView;
 
-@property (nonatomic, strong) NSArray *dataArray;
+@property (nonatomic, strong) NSMutableArray *dataArray;
 @property (nonatomic, strong) NSString *category;
+@property (nonatomic, strong) NSDictionary *jsonDic;
+
+@property (nonatomic, strong) AppDelegate *appdelegate;
 
 @property (nonatomic, assign) int listNumber;
-
-@property (nonatomic, strong) NSMutableDictionary *jsonDic;
 
 @end

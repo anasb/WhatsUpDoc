@@ -28,15 +28,15 @@
 @property (nonatomic, assign) IBOutlet UIImageView *usernameImg;
 @property (nonatomic, assign) IBOutlet UIImageView *passwordImg;
 @property (nonatomic, assign) IBOutlet UIButton *signInBtn;
+@property (nonatomic, assign) IBOutlet UIButton *confirmBtn;
 
-
-@property (nonatomic, strong) NSMutableDictionary *jsonDic;
+//@property (nonatomic, strong) NSMutableDictionary *jsonDic;
 @property (nonatomic, strong) NSArray *jsonTitle;
 
 @property (nonatomic, strong) MSClient *client;
 @property (nonatomic, strong) MSTable *table;
 
 -(IBAction)confirm:(id)sender;
--(IBAction)signIn:(id)sender;
+-(IBAction)switchLogin:(id)sender;
 
 @end

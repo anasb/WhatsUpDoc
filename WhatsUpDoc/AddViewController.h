@@ -20,6 +20,6 @@
 @property (strong, nonatomic) NSString *visitDate;
 @property (strong, nonatomic) NSString *visitTime;
 
-
+@property (strong, nonatomic) NSIndexPath *lastSelected;
 
 @end

@@ -40,10 +40,9 @@
 		E1EE4902175A889600474484 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EE4901175A889600474484 /* main.m */; };
 		E1EE4906175A889600474484 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EE4905175A889600474484 /* AppDelegate.m */; };
 		E1EE4908175A889600474484 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = E1EE4907175A889600474484 /* Default.png */; };
-		E1EE490A175A889600474484 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E1EE4909175A889600474484 /* Default@2x.png */; };
 		E1EE490C175A889600474484 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E1EE490B175A889600474484 /* Default-568h@2x.png */; };
 		E1EE490F175A889600474484 /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E1EE490D175A889600474484 /* MainStoryboard.storyboard */; };
-		E1EE4912175A889600474484 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EE4911175A889600474484 /* ViewController.m */; };
+		E1EE4912175A889600474484 /* HomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EE4911175A889600474484 /* HomeViewController.m */; };
 		E1EE491D175AAD4000474484 /* SignupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1EE491C175AAD4000474484 /* SignupViewController.m */; };
 		E1EE4922175AB85300474484 /* WindowsAzureMobileServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1EE4921175AB85300474484 /* WindowsAzureMobileServices.framework */; };
 		E1EE4927175AD4BD00474484 /* login_field@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = E1EE4924175AD4BD00474484 /* login_field@2x.png */; };
@@ -102,11 +101,10 @@
 		E1EE4904175A889600474484 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E1EE4905175A889600474484 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		E1EE4907175A889600474484 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		E1EE4909175A889600474484 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		E1EE490B175A889600474484 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		E1EE490E175A889600474484 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/MainStoryboard.storyboard; sourceTree = "<group>"; };
-		E1EE4910175A889600474484 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		E1EE4911175A889600474484 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		E1EE4910175A889600474484 /* HomeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HomeViewController.h; sourceTree = "<group>"; };
+		E1EE4911175A889600474484 /* HomeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HomeViewController.m; sourceTree = "<group>"; };
 		E1EE491B175AAD4000474484 /* SignupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignupViewController.h; sourceTree = "<group>"; };
 		E1EE491C175AAD4000474484 /* SignupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignupViewController.m; sourceTree = "<group>"; };
 		E1EE4921175AB85300474484 /* WindowsAzureMobileServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = WindowsAzureMobileServices.framework; sourceTree = "<group>"; };
@@ -257,8 +255,8 @@
 				E1EE4904175A889600474484 /* AppDelegate.h */,
 				E1EE4905175A889600474484 /* AppDelegate.m */,
 				E1EE490D175A889600474484 /* MainStoryboard.storyboard */,
-				E1EE4919175AAD2700474484 /* Home */,
 				E1EE491A175AAD2F00474484 /* Signup */,
+				E1EE4919175AAD2700474484 /* Home */,
 				E18C20C0175B00CE005470D9 /* Add Apointment */,
 				E18C20C8175B3C9C005470D9 /* View Appointments */,
 				E18C20F3175B67EF005470D9 /* Questions */,
@@ -277,7 +275,6 @@
 				E1EE4901175A889600474484 /* main.m */,
 				E1EE4903175A889600474484 /* WhatsUpDoc-Prefix.pch */,
 				E1EE4907175A889600474484 /* Default.png */,
-				E1EE4909175A889600474484 /* Default@2x.png */,
 				E1EE490B175A889600474484 /* Default-568h@2x.png */,
 			);
 			name = "Supporting Files";
@@ -286,8 +283,8 @@
 		E1EE4919175AAD2700474484 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				E1EE4910175A889600474484 /* ViewController.h */,
-				E1EE4911175A889600474484 /* ViewController.m */,
+				E1EE4910175A889600474484 /* HomeViewController.h */,
+				E1EE4911175A889600474484 /* HomeViewController.m */,
 			);
 			name = Home;
 			sourceTree = "<group>";
@@ -364,7 +361,6 @@
 			files = (
 				E1EE4900175A889600474484 /* InfoPlist.strings in Resources */,
 				E1EE4908175A889600474484 /* Default.png in Resources */,
-				E1EE490A175A889600474484 /* Default@2x.png in Resources */,
 				E1EE490C175A889600474484 /* Default-568h@2x.png in Resources */,
 				E1EE490F175A889600474484 /* MainStoryboard.storyboard in Resources */,
 				E1EE4927175AD4BD00474484 /* login_field@2x.png in Resources */,
@@ -391,7 +387,7 @@
 			files = (
 				E1EE4902175A889600474484 /* main.m in Sources */,
 				E1EE4906175A889600474484 /* AppDelegate.m in Sources */,
-				E1EE4912175A889600474484 /* ViewController.m in Sources */,
+				E1EE4912175A889600474484 /* HomeViewController.m in Sources */,
 				E1EE491D175AAD4000474484 /* SignupViewController.m in Sources */,
 				E18C20C3175B0132005470D9 /* AddViewController.m in Sources */,
 				E18C20C6175B06C4005470D9 /* AddListViewController.m in Sources */,

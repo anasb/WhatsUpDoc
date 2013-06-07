@@ -1,22 +1,23 @@
 //
-//  ViewController.m
+//  HomeViewController.m
 //  WhatsUpDoc
 //
 //  Created by Anas Bouzoubaa on 01/06/13.
 //  Copyright (c) 2013 RHINNO. All rights reserved.
 //
 
-#import "ViewController.h"
+#import "HomeViewController.h"
 #import "SignupViewController.h"
 #import "AddViewController.h"
 #import "ViewAppointmentsViewController.h"
 #import "AFNetworkActivityIndicatorManager.h"
+#import <QuartzCore/QuartzCore.h>
 
-@interface ViewController ()
+@interface HomeViewController ()
 
 @end
 
-@implementation ViewController
+@implementation HomeViewController
 
 @synthesize nextVisitTitle, nextVisit, nextVisitLabel;
 
@@ -29,8 +30,6 @@
         [nextVisitTitle setHidden:YES];
         [nextVisitLabel setHidden:YES];
     }
-    
-    
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateNextVisit:) name:@"nextVisitAdded" object:nil];
 }

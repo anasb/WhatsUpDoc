@@ -12,6 +12,8 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (nonatomic, strong) NSMutableDictionary *jsonDic;
+@property (nonatomic, retain) NSDictionary *doctorsJsonDic;
+@property (nonatomic, retain) NSMutableArray *specialtiesArray;
+@property (nonatomic, retain) NSMutableArray *doctorsArray;
 
 @end

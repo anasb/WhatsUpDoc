@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  HomeViewController.h
 //  WhatsUpDoc
 //
 //  Created by Anas Bouzoubaa on 01/06/13.
@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
+@interface HomeViewController : UIViewController
 
 @property (assign, nonatomic) IBOutlet UIImageView *nextVisitTitle;
 @property (assign, nonatomic) IBOutlet UILabel *nextVisitLabel;

@@ -7,7 +7,7 @@
 //
 
 #import "SignupViewController.h"
-#import "ViewController.h"
+#import "HomeViewController.h"
 #import <WindowsAzureMobileServices/WindowsAzureMobileServices.h>
 #import "AFNetworking.h"
 #import <QuartzCore/QuartzCore.h>
@@ -19,7 +19,7 @@
 
 @implementation SignupViewController
 
-@synthesize table, client, nameTf, usernameTf, passwordTf, myScrollView, nameImg, signInBtn, bigTitle, usernameImg, passwordImg, loading, jsonDic;
+@synthesize table, client, nameTf, usernameTf, passwordTf, myScrollView, nameImg, signInBtn, bigTitle, usernameImg, passwordImg, loading, confirmBtn;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -30,71 +30,70 @@
     return self;
 }
 
+#pragma mark - Views
 -(void)viewWillAppear:(BOOL)animated
 {
     [self.navigationController setNavigationBarHidden:YES animated:NO];
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    self.client = [MSClient clientWithApplicationURL:[NSURL URLWithString:@"https://whatsupdoc.azure-mobile.net"] applicationKey:@"LLmUeCVDYzjHdtefjnPJCdfSOzUCwo56"];
-    self.table = [self.client tableWithName:@"User"];
-
     svos = myScrollView.contentOffset;
-    
-    jsonDic = [[NSMutableDictionary alloc] init];
-    
-    //[self signInWebService:@"abouzoubaa" andPwd:@"rhinno"];
-    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+
+    //jsonDic = [[NSMutableDictionary alloc] init];
 }
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    [self bypassLogin];
+}
+
+#pragma mark - Web Services calls
 -(void)signInWebService:(NSString *)username andPwd:(NSString *)password
 {
-    NSURL *url = [NSURL URLWithString:@"https://whatsupdoc.azurewebsites.net"];
+    // ----------------------------- PARAMS ----------------------------------------------------------------------
     
-    AFHTTPClient *afClient = [[AFHTTPClient alloc] initWithBaseURL:url];
-    [afClient setDefaultHeader:@"Accept" value:@"application/json"];
+    AFHTTPClient *newClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://whatsupdoc.azurewebsites.net"]];
+    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:username,@"username",password,@"password", nil];
+    [newClient setParameterEncoding:AFJSONParameterEncoding];
     
-    NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:username, @"username", password, @"password", nil];
-
-    NSMutableURLRequest *request = [afClient requestWithMethod:@"POST" path:@"/webservices/authenticate.aspx" parameters:params];
+    // ----------------------------- REQUEST ---------------------------------------------------------------------
     
-    NSLog(@"request: %@", [request description]);
-    NSLog(@"params: %@", params);
+    [newClient getPath:@"/webservices/authenticate.aspx" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
         
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        [self.loading removeFromSuperview];
+        [self.view setUserInteractionEnabled:YES];
         
-        NSLog(@"request: %@", request);
+        NSError *error;
         
-        NSLog(@"JSON: %@", JSON);
+        NSArray *responseDic = (NSArray *)[NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:&error];
         
-        [self getDoctors];
-//        
-//        if ([[JSON objectAtIndex:1] isEqualToString:@"true"]) {
-//            [self goToHomePage];
-//        } else {
-//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Wrong password/username" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-//            //[alert show];
-//        }
+        // Right username & pwd
+        if ([[responseDic objectAtIndex:1] isEqualToString:@"true"]) {
+            
+            [self getDoctors];
+            [self goToHomePage];
+            
+        // Wrong username / pwd
+        } else {
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Wrong password or username" delegate:self cancelButtonTitle:@"Try again" otherButtonTitles:nil];
+            [alert show];
+        }
         
-        //[self.loading removeFromSuperview];
-        //[self.view setUserInteractionEnabled:YES];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+        [self.loading removeFromSuperview];
+        [self.view setUserInteractionEnabled:YES];
         
-        NSLog(@"\n--------------------------ERROR----------------------------------\n%@\n-----------------------------------------------------------------\n", [error description]);
-        NSLog(@"JSON: %@", JSON);
-        //[self.loading removeFromSuperview];
-        //[self.view setUserInteractionEnabled:YES];
+        NSLog(@"[HTTPClient Error]: %@", error.localizedDescription);
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Connection problem" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        //[alert show];
-
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Sorry, there was a connection problem! Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
     }];
-    [operation start];
- 
+    
 }
 
 -(void)signUpWebService:(NSString *)name andUsername:(NSString *)username andPwd:(NSString *)password
@@ -134,128 +133,69 @@
     
 }
 
-
--(void)confirm:(id)sender
-{
-    if ([usernameTf.text isEqualToString:@""] || [passwordTf.text isEqualToString:@""]) {
-        
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Input all required fields" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [alert show];
-        
-    } else {
-        if (nameImg.alpha == 0) {
-            [self.view setUserInteractionEnabled:NO];
-            
-            loading = [[UIView alloc] initWithFrame:CGRectMake(90, 140, 150, 150)];
-            loading.backgroundColor = [UIColor blackColor];
-            loading.alpha = 0.7 ;
-            [loading.layer setMasksToBounds:YES];
-            [loading.layer setCornerRadius:10];
-            
-            UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(65, 65, 20, 20)];
-            [activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
-            [activityIndicator startAnimating];
-            
-            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 120, 110, 25)];
-            label.text = @"Loading...";
-            label.backgroundColor = [UIColor clearColor];
-            label.textColor = [UIColor whiteColor];
-            label.textAlignment = NSTextAlignmentCenter;
-            label.font = [UIFont boldSystemFontOfSize:18];
-            
-            [loading addSubview:activityIndicator];
-            [loading addSubview:label];
-            [self.view addSubview:loading];
-            
-            
-            [self signInWebService:usernameTf.text andPwd:passwordTf.text];
-            
-        } else {
-            
-            if ([nameTf.text isEqualToString:@""]) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Input all required fields" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                
-            } else {
-                
-                [self.view setUserInteractionEnabled:NO];
-                
-                loading = [[UIView alloc] initWithFrame:CGRectMake(90, 140, 150, 150)];
-                loading.backgroundColor = [UIColor blackColor];
-                loading.alpha = 0.7 ;
-                [loading.layer setMasksToBounds:YES];
-                [loading.layer setCornerRadius:10];
-                
-                UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(65, 65, 20, 20)];
-                [activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
-                [activityIndicator startAnimating];
-                
-                UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 120, 110, 25)];
-                label.text = @"Loading...";
-                label.backgroundColor = [UIColor clearColor];
-                label.textColor = [UIColor whiteColor];
-                label.textAlignment = NSTextAlignmentCenter;
-                label.font = [UIFont boldSystemFontOfSize:18];
-                
-                [loading addSubview:activityIndicator];
-                [loading addSubview:label];
-                [self.view addSubview:loading];
-                
-                
-                [self signUpWebService:nameTf.text andUsername:usernameTf.text andPwd:passwordTf.text];
-                
-                
-
-            }
-            
-        }
-
-    }
-    
-}
-
+#pragma mark - Getting list of doctors
 - (void)getDoctors
 {
-    NSURL *url = [NSURL URLWithString:@"https://whatsupdoc.azurewebsites.net"];
     
-    AFHTTPClient *afClient = [[AFHTTPClient alloc] initWithBaseURL:url];
-    [afClient setDefaultHeader:@"Accept" value:@"application/json"];
-        
-    NSMutableURLRequest *request = [afClient requestWithMethod:@"GET" path:@"/webservices/doctors.aspx" parameters:nil];
+    // ----------------------------- PARAMS ----------------------------------------------------------------------
     
+    AFHTTPClient *newClient = [[AFHTTPClient alloc] initWithBaseURL:[NSURL URLWithString:@"https://whatsupdoc.azurewebsites.net"]];
+    [newClient setParameterEncoding:AFJSONParameterEncoding];
     
-    AFJSONRequestOperation *operation = [AFJSONRequestOperation JSONRequestOperationWithRequest:request success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-                NSLog(@"JSON doctors: %@", JSON);
+    // ----------------------------- REQUEST ---------------------------------------------------------------------
+    
+    [newClient getPath:@"/webservices/doctors.aspx" parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         
-        
-        AppDelegate *appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-        appdelegate.jsonDic = JSON;
-        NSLog(@"appdele: %@", appdelegate.jsonDic);
-        
-        [self.loading removeFromSuperview];
-        [self.view setUserInteractionEnabled:YES];
-        
-    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
-        
-        NSLog(@"\n--------------------------ERROR----------------------------------\n%@\n-----------------------------------------------------------------\n", [error description]);
-        NSLog(@"JSON doctors: %@", JSON);
-        [self.loading removeFromSuperview];
-        [self.view setUserInteractionEnabled:YES];
+        NSError *error;
+        NSDictionary *responseDic = (NSDictionary *)[NSJSONSerialization JSONObjectWithData:responseObject options:NSJSONReadingMutableContainers error:&error];
 
+        AppDelegate *appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+        appdelegate.doctorsJsonDic = responseDic;
+        appdelegate.specialtiesArray = [responseDic valueForKey:@"Title"];
+        appdelegate.doctorsArray = [responseDic valueForKey:@"Name"];
+        
+        NSLog(@"Doctors: \n%@", responseDic);
+        
+        [self parseResults];
+
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"[HTTPClient Error] (doctors): %@", error.localizedDescription);
+        
     }];
-    [operation start];
     
-    [self goToHomePage];
 }
 
+#pragma mark - Parse json
+-(void)parseResults
+{
+    AppDelegate *appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+
+    NSArray *newArray = [NSArray arrayWithArray:appdelegate.specialtiesArray];
+    NSSet *set = [NSSet setWithArray:newArray];
+    
+    newArray = [set allObjects];
+    appdelegate.specialtiesArray = nil;
+    appdelegate.specialtiesArray = [NSMutableArray arrayWithArray:newArray];
+    
+    NSLog(@"After parse:%@", appdelegate.specialtiesArray);
+}
+
+#pragma mark - Move on to Homepage
 -(void)goToHomePage
 {
+    [self.loading removeFromSuperview];
+    [self.view setUserInteractionEnabled:YES];
+
     UIStoryboard*storyboard =[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil];
-    ViewController *viewC = (ViewController *)[storyboard instantiateViewControllerWithIdentifier:@"homeViewID"];
+    HomeViewController *viewC = (HomeViewController *)[storyboard instantiateViewControllerWithIdentifier:@"homeViewID"];
     [self.navigationController pushViewController:viewC animated:YES];
 }
 
--(void)signIn:(id)sender
+#pragma mark - IBActions
+
+// Switch between signin & signup
+-(IBAction)switchLogin:(id)sender
 {
     if (nameImg.alpha == 0) {
         
@@ -269,8 +209,8 @@
             [nameImg setAlpha:1];
             [nameTf setAlpha:1];
             [bigTitle setText:@"Create an account"];
-            [signInBtn setTitle:@"Already have an account?" forState:UIControlStateNormal]; 
-
+            [signInBtn setTitle:@"Already have an account?" forState:UIControlStateNormal];
+            [confirmBtn setTitle:@"Sign up" forState:UIControlStateNormal];
         }];
         
         
@@ -287,12 +227,85 @@
             [nameTf setAlpha:0];
             [bigTitle setText:@"Sign in"];
             [signInBtn setTitle:@"Create an account" forState:UIControlStateNormal];
-
+            [confirmBtn setTitle:@"Sign in" forState:UIControlStateNormal];
         }];
     }
 
 }
 
+// Hit confirm button: signin/signup action
+-(void)confirm:(id)sender
+{
+    // Hide keyboard
+    [nameTf resignFirstResponder];
+    [usernameTf resignFirstResponder];
+    [passwordTf resignFirstResponder];
+    
+    // Make sure all fields are full
+    if ([usernameTf.text isEqualToString:@""] || [passwordTf.text isEqualToString:@""]) {
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Input all required fields" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [alert show];
+        
+    } else {
+        // No name: signin
+        if (nameImg.alpha == 0) {
+            
+            [self showLoader];
+            
+            // API Call
+            [self signInWebService:usernameTf.text andPwd:passwordTf.text];
+            
+        // Name exist: signup
+        } else {
+            
+            if ([nameTf.text isEqualToString:@""]) {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Input all required fields" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+                
+            } else {
+                
+                [self showLoader];
+                
+                // API Call
+                [self signUpWebService:nameTf.text andUsername:usernameTf.text andPwd:passwordTf.text];
+                
+            }
+            
+        }
+        
+    }
+    
+}
+
+-(void)showLoader
+{
+    [self.view setUserInteractionEnabled:NO];
+    
+    loading = [[UIView alloc] initWithFrame:CGRectMake(90, 140, 150, 150)];
+    loading.backgroundColor = [UIColor blackColor];
+    loading.alpha = 0.7 ;
+    [loading.layer setMasksToBounds:YES];
+    [loading.layer setCornerRadius:10];
+    
+    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(65, 65, 20, 20)];
+    [activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [activityIndicator startAnimating];
+    
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(20, 120, 110, 25)];
+    label.text = @"Loading...";
+    label.backgroundColor = [UIColor clearColor];
+    label.textColor = [UIColor whiteColor];
+    label.textAlignment = NSTextAlignmentCenter;
+    label.font = [UIFont boldSystemFontOfSize:18];
+    
+    [loading addSubview:activityIndicator];
+    [loading addSubview:label];
+    [self.view addSubview:loading];
+
+}
+
+#pragma mark - TextField delegates
 -(BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField == nameTf) {
@@ -301,6 +314,7 @@
         [passwordTf becomeFirstResponder];
     } else if (textField == passwordTf) {
         [passwordTf resignFirstResponder];
+        [self confirm:nil];
     }
     
     return NO;
@@ -325,23 +339,18 @@
     [myScrollView setScrollEnabled:YES];
 }
 
-- (void)queryAzure
-{
-    NSPredicate * predicate = [NSPredicate predicateWithFormat:@"Username != nil"];
-    
-    MSQuery *query = [self.table queryWithPredicate:predicate];
-    
-    query.includeTotalCount = YES;
-    
-    [query readWithCompletion:^(NSArray *items, NSInteger totalCount, NSError *error) {
-        NSLog(@"%i items: %@", totalCount, items);
-    }];
-}
-
+#pragma mark - Memory Management
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Cheats - DON'T FORGET TO DELETE
+-(void)bypassLogin
+{
+    [self showLoader];
+    [self signInWebService:@"abouzoubaa" andPwd:@"rhinno"];
 }
 
 @end

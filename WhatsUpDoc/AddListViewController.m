@@ -16,7 +16,7 @@
 
 @implementation AddListViewController
 
-@synthesize dataArray, category, listNumber, myTableView, jsonDic;
+@synthesize dataArray, category, listNumber, myTableView, jsonDic, appdelegate;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -31,37 +31,52 @@
 {
     [super viewDidLoad];
 
-    [self setUpData];
-
     [self.view setBackgroundColor:[UIColor colorWithPatternImage:[UIImage imageNamed:@"add-bg.png"]]];
     UIImageView *imgView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"add-bg.png"]];
     [myTableView setBackgroundView:imgView];
     
-    jsonDic = [[NSMutableDictionary alloc] init];
-    AppDelegate *appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
-    jsonDic = appdelegate.jsonDic;
+    jsonDic = [[NSDictionary alloc] init];
+    appdelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
+    jsonDic = appdelegate.doctorsJsonDic;
+    
+    NSLog(@"[AddList:viewDidLoad] jsonDic:%@", jsonDic);
+    
+    [self setUpData];
+}
 
+-(void)viewWillAppear:(BOOL)animated
+{
+    NSIndexPath *selected = [myTableView indexPathForSelectedRow];
+    if (selected) [myTableView deselectRowAtIndexPath:selected animated:YES];
 }
 
 - (void)setUpData
 {
     if (listNumber == 0) {
-        category = @"Specialties";
-        dataArray = [[NSArray alloc] initWithObjects:@"Nephrology", @"Cardiology", @"Pediatrics", @"Urology", @"Traumatology", nil];
         
-        NSLog(@"%@", [jsonDic valueForKey:@"Title"]);
+        category = @"Specialties";
+        dataArray = [[NSMutableArray alloc] initWithArray:appdelegate.specialtiesArray];
         
     } else if (listNumber == 1) {
         
         category = @"Doctors";
-        dataArray = [[NSArray alloc] initWithObjects:@"Dr Julien L. Pham, MD, MPH", @"Dr Sagar Nigwekar, MD", @"Dr Andrey Ostrovsky, MD", nil];
+        AddViewController *addView = [[self.navigationController viewControllers] objectAtIndex:2];
+        
+        dataArray = [[NSMutableArray alloc] init];
+        
+        for (int i=0; i<[appdelegate.doctorsArray count]; i++) {
+            
+            if ([[[appdelegate.doctorsJsonDic valueForKey:@"Title"] objectAtIndex:i] isEqualToString:addView.specialty]) {
+                
+                [dataArray addObject:[[appdelegate.doctorsJsonDic valueForKey:@"Name"] objectAtIndex:i]];
+            }
+        }
     }
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Table view data source
@@ -106,8 +121,6 @@
         [[NSNotificationCenter defaultCenter] postNotificationName:@"doctorChosen" object:nil userInfo:dict];
     }
     
-    
-
     [self.navigationController popViewControllerAnimated:YES];
 }
 
